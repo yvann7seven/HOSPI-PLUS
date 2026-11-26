@@ -1,0 +1,29 @@
+python -c "
+import json
+
+path = r'C:\Users\leroi\.gemini\antigravity\brain\601dbffa-3646-44d5-a055-d2529ea29bae\.system_generated\logs\transcript_full.jsonl'
+with open(path, 'r', encoding='utf-8') as f:
+    for idx, line in enumerate(f):
+        if 'maintenant le cote client' in line:
+            data = json.loads(line)
+            # Find the string recursively
+            def extract(obj):
+                if isinstance(obj, str):
+                    if 'maintenant le cote client' in obj:
+                        return obj
+                elif isinstance(obj, dict):
+                    for v in obj.values():
+                        res = extract(v)
+                        if res: return res
+                elif isinstance(obj, list):
+                    for v in obj:
+                        res = extract(v)
+                        if res: return res
+                return None
+            res = extract(data)
+            if res:
+                print(f'Found at line {idx}, length: {len(res)}')
+                with open('extracted_user_request.txt', 'w', encoding='utf-8') as out:
+                    out.write(res)
+                print('Written successfully!')
+"
